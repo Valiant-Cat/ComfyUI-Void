@@ -104,6 +104,8 @@ Recommended workflow:
 
 Recommended mask node: https://github.com/9nate-drake/Comfyui-SecNodes.git
 
+Example workflow JSON: `ComfyUI/custom_nodes/ComfyUI-Void/void-workflow-example.json`
+
 ## Node Notes
 
 ### VOID Model Loader
