@@ -102,6 +102,8 @@ Recommended workflow:
 5. Run `VOID Inpaint`.
 6. Save the output frames back to video with your preferred ComfyUI video save node.
 
+Recommended mask node: https://github.com/9nate-drake/Comfyui-SecNodes.git
+
 ## Node Notes
 
 ### VOID Model Loader
