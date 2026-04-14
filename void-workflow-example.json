@@ -1,0 +1,1793 @@
+{
+  "id": "82d54840-e6eb-4cff-9873-f055e1a95cb8",
+  "revision": 0,
+  "last_node_id": 35,
+  "last_link_id": 69,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "SeCModelLoader",
+      "pos": [
+        1403.890362839849,
+        -2942.7116626508014
+      ],
+      "size": [
+        251.66017064617267,
+        142.4620053148942
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "模型文件",
+          "name": "model_file",
+          "type": "COMBO",
+          "widget": {
+            "name": "model_file"
+          },
+          "link": null
+        },
+        {
+          "label": "设备",
+          "name": "device",
+          "type": "COMBO",
+          "widget": {
+            "name": "device"
+          },
+          "link": null
+        },
+        {
+          "label": "使用Flash注意力",
+          "name": "use_flash_attn",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "use_flash_attn"
+          },
+          "link": null
+        },
+        {
+          "label": "允许遮罩重叠",
+          "name": "allow_mask_overlap",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "allow_mask_overlap"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "model",
+          "name": "model",
+          "type": "SEC_MODEL",
+          "links": [
+            15
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "9nate-drake/Comfyui-SecNodes",
+        "ver": "3df3b1378deaaf0e5b25a08ff002bccea34e18d2",
+        "Node name for S&R": "SeCModelLoader",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "SeC-4B-bf16.safetensors",
+        "auto",
+        true,
+        true
+      ]
+    },
+    {
+      "id": 4,
+      "type": "ImageFromBatch",
+      "pos": [
+        1433.839465912736,
+        -3104.234732084641
+      ],
+      "size": [
+        210,
+        82
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 47
+        },
+        {
+          "label": "batch_index",
+          "name": "batch_index",
+          "type": "INT",
+          "widget": {
+            "name": "batch_index"
+          },
+          "link": null
+        },
+        {
+          "label": "length",
+          "name": "length",
+          "type": "INT",
+          "widget": {
+            "name": "length"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            28
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.60",
+        "Node name for S&R": "ImageFromBatch",
+        "widget_ue_connectable": {
+          "batch_index": true
+        }
+      },
+      "widgets_values": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": 20,
+      "type": "VOIDMaskProcessor",
+      "pos": [
+        2584.0125223560335,
+        -2407.1554544361384
+      ],
+      "size": [
+        294.92953653231143,
+        174
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask_video",
+          "shape": 7,
+          "type": "MASK",
+          "link": 35
+        },
+        {
+          "name": "mask_video_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "void_mask",
+          "type": "MASK",
+          "links": [
+            40
+          ]
+        },
+        {
+          "name": "quadmask_preview",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VOIDMaskProcessor"
+      },
+      "widgets_values": [
+        0.5,
+        0,
+        0,
+        0,
+        true
+      ]
+    },
+    {
+      "id": 33,
+      "type": "MaskToImage",
+      "pos": [
+        3078.7602595407507,
+        -3312.0770267314247
+      ],
+      "size": [
+        193.2779296875,
+        26
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 66
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            67
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.18.1",
+        "Node name for S&R": "MaskToImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 32,
+      "type": "LayerUtility: ImageBlendAdvance",
+      "pos": [
+        3291.776364235855,
+        -3124.792837116973
+      ],
+      "size": [
+        318.9439453125,
+        338
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "background_image",
+          "type": "IMAGE",
+          "link": 63
+        },
+        {
+          "name": "layer_image",
+          "type": "IMAGE",
+          "link": 67
+        },
+        {
+          "name": "layer_mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            64
+          ]
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui_layerstyle",
+        "ver": "d94bef1ee5ed3656f5ff1bb2830a4ffd94f40935",
+        "Node name for S&R": "LayerUtility: ImageBlendAdvance"
+      },
+      "widgets_values": [
+        true,
+        "normal",
+        40,
+        50,
+        50,
+        "None",
+        1,
+        1,
+        0,
+        "nearest",
+        0
+      ],
+      "color": "rgba(38, 73, 116, 0.7)"
+    },
+    {
+      "id": 18,
+      "type": "VOIDModelLoader",
+      "pos": [
+        2585.7977130567183,
+        -2702.701097274339
+      ],
+      "size": [
+        307.953125,
+        226
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "void_model",
+          "type": "VOID_MODEL",
+          "links": [
+            52
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VOIDModelLoader"
+      },
+      "widgets_values": [
+        "CogVideoX-Fun-V1.5-5b-InP",
+        "pass1",
+        "void_pass1.safetensors",
+        "bf16",
+        "model_cpu_offload",
+        "model_default",
+        true,
+        false
+      ]
+    },
+    {
+      "id": 5,
+      "type": "GrowMaskWithBlur",
+      "pos": [
+        2909.082981718248,
+        -3103.0188320117313
+      ],
+      "size": [
+        292.748046875,
+        246
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "遮罩",
+          "name": "mask",
+          "type": "MASK",
+          "link": 18
+        },
+        {
+          "label": "扩展",
+          "name": "expand",
+          "type": "INT",
+          "widget": {
+            "name": "expand"
+          },
+          "link": null
+        },
+        {
+          "label": "扩展增量",
+          "name": "incremental_expandrate",
+          "type": "FLOAT",
+          "widget": {
+            "name": "incremental_expandrate"
+          },
+          "link": null
+        },
+        {
+          "label": "倒角",
+          "name": "tapered_corners",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "tapered_corners"
+          },
+          "link": null
+        },
+        {
+          "label": "反转输入",
+          "name": "flip_input",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "flip_input"
+          },
+          "link": null
+        },
+        {
+          "label": "模糊半径",
+          "name": "blur_radius",
+          "type": "FLOAT",
+          "widget": {
+            "name": "blur_radius"
+          },
+          "link": null
+        },
+        {
+          "label": "线性透明",
+          "name": "lerp_alpha",
+          "type": "FLOAT",
+          "widget": {
+            "name": "lerp_alpha"
+          },
+          "link": null
+        },
+        {
+          "label": "腐蚀系数",
+          "name": "decay_factor",
+          "type": "FLOAT",
+          "widget": {
+            "name": "decay_factor"
+          },
+          "link": null
+        },
+        {
+          "label": "填补",
+          "name": "fill_holes",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "fill_holes"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": [
+            35,
+            66
+          ]
+        },
+        {
+          "label": "mask_inverted",
+          "name": "mask_inverted",
+          "type": "MASK"
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-kjnodes",
+        "ver": "bb205d809b467307b8ec3bb1a22680a4873187f8",
+        "Node name for S&R": "GrowMaskWithBlur",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        10,
+        0,
+        true,
+        false,
+        2,
+        1,
+        1,
+        false
+      ]
+    },
+    {
+      "id": 22,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        3685.6352221386214,
+        -3113.8758537822177
+      ],
+      "size": [
+        226.5576171875,
+        623.41015625
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "图像",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 64
+        },
+        {
+          "label": "音频",
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "label": "批次管理",
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "label": "帧率",
+          "name": "frame_rate",
+          "type": "FLOAT",
+          "widget": {
+            "name": "frame_rate"
+          },
+          "link": null
+        },
+        {
+          "label": "循环次数",
+          "name": "loop_count",
+          "type": "INT",
+          "widget": {
+            "name": "loop_count"
+          },
+          "link": null
+        },
+        {
+          "label": "文件名前缀",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "label": "格式",
+          "name": "format",
+          "type": "COMBO",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "label": "Ping-Pong",
+          "name": "pingpong",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "pingpong"
+          },
+          "link": null
+        },
+        {
+          "label": "保存到输出文件夹",
+          "name": "save_output",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "save_output"
+          },
+          "link": null
+        },
+        {
+          "label": "保存元数据",
+          "name": "save_metadata",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "save_metadata"
+          },
+          "link": null
+        },
+        {
+          "label": "修剪音频",
+          "name": "trim_to_audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "trim_to_audio"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "3234937ff5f3ca19068aaba5042771514de2429d",
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 24,
+        "loop_count": 0,
+        "filename_prefix": "AnimateDiff",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 19,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": true,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "AnimateDiff_00045.mp4",
+            "subfolder": "",
+            "type": "output",
+            "format": "video/h264-mp4",
+            "frame_rate": 24,
+            "workflow": "AnimateDiff_00045.png",
+            "fullpath": "/root/lvfengchun/code/ComfyUI/output/AnimateDiff_00045.mp4"
+          }
+        }
+      }
+    },
+    {
+      "id": 34,
+      "type": "PreviewImage",
+      "pos": [
+        3697.1657310921287,
+        -2343.026576082491
+      ],
+      "size": [
+        298.6777307879893,
+        342.9696745509043
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 68
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.18.1",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 14,
+      "type": "SeCVideoSegmentation",
+      "pos": [
+        2598.8488604249624,
+        -3065.8385458117136
+      ],
+      "size": [
+        285.3125,
+        310
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "模型",
+          "name": "model",
+          "type": "SEC_MODEL",
+          "link": 15
+        },
+        {
+          "label": "视频帧",
+          "name": "frames",
+          "type": "IMAGE",
+          "link": 48
+        },
+        {
+          "label": "边界框",
+          "name": "bbox",
+          "shape": 7,
+          "type": "BBOX",
+          "link": null
+        },
+        {
+          "label": "输入遮罩",
+          "name": "input_mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        },
+        {
+          "label": "正点坐标",
+          "name": "positive_points",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "positive_points"
+          },
+          "link": 29
+        },
+        {
+          "label": "负点坐标",
+          "name": "negative_points",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "negative_points"
+          },
+          "link": 30
+        },
+        {
+          "label": "跟踪方向",
+          "name": "tracking_direction",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "tracking_direction"
+          },
+          "link": null
+        },
+        {
+          "label": "标注帧索引",
+          "name": "annotation_frame_idx",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "annotation_frame_idx"
+          },
+          "link": null
+        },
+        {
+          "label": "对象ID",
+          "name": "object_id",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "object_id"
+          },
+          "link": null
+        },
+        {
+          "label": "最大跟踪帧数",
+          "name": "max_frames_to_track",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "max_frames_to_track"
+          },
+          "link": null
+        },
+        {
+          "label": "MLLM内存大小",
+          "name": "mllm_memory_size",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "mllm_memory_size"
+          },
+          "link": null
+        },
+        {
+          "label": "将视频卸载到CPU",
+          "name": "offload_video_to_cpu",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "offload_video_to_cpu"
+          },
+          "link": null
+        },
+        {
+          "label": "自动卸载模型",
+          "name": "auto_unload_model",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "auto_unload_model"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "masks",
+          "type": "MASK",
+          "links": [
+            18
+          ]
+        },
+        {
+          "name": "object_ids",
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "9nate-drake/Comfyui-SecNodes",
+        "ver": "f2fe7bd072c5dbb851ae9c4137122d7c14ff416c",
+        "Node name for S&R": "SeCVideoSegmentation"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "bidirectional",
+        0,
+        1,
+        -1,
+        12,
+        20,
+        false
+      ]
+    },
+    {
+      "id": 35,
+      "type": "PreviewAny",
+      "pos": [
+        2631.9117889018507,
+        -3303.107322465986
+      ],
+      "size": [
+        210,
+        166
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 69
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.18.1",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 13,
+      "type": "VHS_LoadVideo",
+      "pos": [
+        1393.7592821132075,
+        -2710.6021930072143
+      ],
+      "size": [
+        261.6533203125,
+        640.2006178830228
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "批次管理",
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "label": "视频",
+          "name": "video",
+          "type": "COMBO",
+          "widget": {
+            "name": "video"
+          },
+          "link": null
+        },
+        {
+          "label": "强制帧率",
+          "name": "force_rate",
+          "type": "FLOAT",
+          "widget": {
+            "name": "force_rate"
+          },
+          "link": null
+        },
+        {
+          "label": "自定义宽度",
+          "name": "custom_width",
+          "type": "INT",
+          "widget": {
+            "name": "custom_width"
+          },
+          "link": null
+        },
+        {
+          "label": "自定义高度",
+          "name": "custom_height",
+          "type": "INT",
+          "widget": {
+            "name": "custom_height"
+          },
+          "link": null
+        },
+        {
+          "label": "帧数读取上限",
+          "name": "frame_load_cap",
+          "type": "INT",
+          "widget": {
+            "name": "frame_load_cap"
+          },
+          "link": null
+        },
+        {
+          "label": "跳过前X帧",
+          "name": "skip_first_frames",
+          "type": "INT",
+          "widget": {
+            "name": "skip_first_frames"
+          },
+          "link": null
+        },
+        {
+          "label": "间隔",
+          "name": "select_every_nth",
+          "type": "INT",
+          "widget": {
+            "name": "select_every_nth"
+          },
+          "link": null
+        },
+        {
+          "label": "格式",
+          "name": "format",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "图像",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            46
+          ]
+        },
+        {
+          "name": "frame_count",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": null
+        },
+        {
+          "name": "video_info",
+          "type": "VHS_VIDEOINFO",
+          "links": [
+            42
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "3234937ff5f3ca19068aaba5042771514de2429d",
+        "Node name for S&R": "VHS_LoadVideo"
+      },
+      "widgets_values": {
+        "video": "LTX-2_00032-audio.mp4",
+        "force_rate": 24,
+        "custom_width": 0,
+        "custom_height": 0,
+        "frame_load_cap": 0,
+        "skip_first_frames": 0,
+        "select_every_nth": 1,
+        "format": "AnimateDiff",
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "LTX-2_00032-audio.mp4",
+            "type": "input",
+            "format": "video/mp4",
+            "force_rate": 24,
+            "custom_width": 0,
+            "custom_height": 0,
+            "frame_load_cap": 0,
+            "skip_first_frames": 0,
+            "select_every_nth": 1
+          }
+        }
+      }
+    },
+    {
+      "id": 24,
+      "type": "VHS_VideoInfoLoaded",
+      "pos": [
+        1771.2919535644796,
+        -2088.195453029243
+      ],
+      "size": [
+        256.2392578125,
+        106
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "视频信息",
+          "name": "video_info",
+          "type": "VHS_VIDEOINFO",
+          "link": 42
+        }
+      ],
+      "outputs": [
+        {
+          "name": "fps🟦",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "frame_count🟦",
+          "type": "INT",
+          "links": [
+            45
+          ]
+        },
+        {
+          "name": "duration🟦",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "width🟦",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "height🟦",
+          "type": "INT",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "3234937ff5f3ca19068aaba5042771514de2429d",
+        "Node name for S&R": "VHS_VideoInfoLoaded"
+      },
+      "widgets_values": {}
+    },
+    {
+      "id": 25,
+      "type": "LayerUtility: ImageScaleByAspectRatio V2",
+      "pos": [
+        2083.456490955545,
+        -2087.8984125407683
+      ],
+      "size": [
+        317.2681640625,
+        330
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 46
+        },
+        {
+          "name": "mask",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            47,
+            48,
+            49,
+            63
+          ]
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "original_size",
+          "type": "BOX",
+          "links": null
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            56
+          ]
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            57
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui_layerstyle",
+        "ver": "89014d833d2ad0998d724090eff1456692692a1d",
+        "Node name for S&R": "LayerUtility: ImageScaleByAspectRatio V2"
+      },
+      "widgets_values": [
+        "original",
+        1,
+        1,
+        "crop",
+        "nearest",
+        "64",
+        "total_pixel(kilo pixel)",
+        400,
+        "#000000"
+      ],
+      "color": "rgba(38, 73, 116, 0.7)"
+    },
+    {
+      "id": 17,
+      "type": "PointsEditor",
+      "pos": [
+        1785.5477410099002,
+        -3263.214546401029
+      ],
+      "size": [
+        621,
+        1094
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "背景图",
+          "name": "bg_image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 28
+        },
+        {
+          "label": "点位置",
+          "name": "points_store",
+          "type": "STRING",
+          "widget": {
+            "name": "points_store"
+          },
+          "link": null
+        },
+        {
+          "label": "BBox位置",
+          "name": "bbox_store",
+          "type": "STRING",
+          "widget": {
+            "name": "bbox_store"
+          },
+          "link": null
+        },
+        {
+          "label": "BBox格式",
+          "name": "bbox_format",
+          "type": "COMBO",
+          "widget": {
+            "name": "bbox_format"
+          },
+          "link": null
+        },
+        {
+          "label": "宽度",
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": null
+        },
+        {
+          "label": "高度",
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": null
+        },
+        {
+          "label": "规格化",
+          "name": "normalize",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "normalize"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive_coords",
+          "type": "STRING",
+          "links": [
+            29,
+            69
+          ]
+        },
+        {
+          "name": "negative_coords",
+          "type": "STRING",
+          "links": [
+            30
+          ]
+        },
+        {
+          "name": "bbox",
+          "type": "BBOX",
+          "links": null
+        },
+        {
+          "name": "bbox_mask",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "cropped_image",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-kjnodes",
+        "ver": "5b38397a6430fdb16c7bd14a6bd64c2b0e69a5f0",
+        "Node name for S&R": "PointsEditor",
+        "imgData": {
+          "type": "temp",
+          "filename": "editor_bg_17_1776148667716.webp"
+        },
+        "points": "PointsEditor",
+        "neg_points": "PointsEditor"
+      },
+      "widgets_values": [
+        "{\"positive\":[{\"x\":388.34408924012376,\"y\":608.8786671317587}],\"negative\":[]}",
+        "[{\"x\":388.34408924012376,\"y\":608.8786671317587}]",
+        "[]",
+        "[{}]",
+        "[{}]",
+        "xyxy",
+        576,
+        768,
+        false,
+        "",
+        null
+      ]
+    },
+    {
+      "id": 19,
+      "type": "VOIDInpaint",
+      "pos": [
+        2934.4228397840334,
+        -2703.726731938162
+      ],
+      "size": [
+        400,
+        466
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "void_model",
+          "type": "VOID_MODEL",
+          "link": 53
+        },
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 49
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 40
+        },
+        {
+          "name": "pass1_images",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": 57
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": 56
+        },
+        {
+          "name": "max_video_length",
+          "type": "INT",
+          "widget": {
+            "name": "max_video_length"
+          },
+          "link": 45
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            41,
+            68
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VOIDInpaint"
+      },
+      "widgets_values": [
+        "Clean wooden floors",
+        878312213157135,
+        "randomize",
+        384,
+        672,
+        85,
+        197,
+        true,
+        1,
+        30,
+        24,
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 23,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        3368.233246958016,
+        -2709.8932707623458
+      ],
+      "size": [
+        226.5576171875,
+        623.41015625
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "图像",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 41
+        },
+        {
+          "label": "音频",
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "label": "批次管理",
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "label": "帧率",
+          "name": "frame_rate",
+          "type": "FLOAT",
+          "widget": {
+            "name": "frame_rate"
+          },
+          "link": null
+        },
+        {
+          "label": "循环次数",
+          "name": "loop_count",
+          "type": "INT",
+          "widget": {
+            "name": "loop_count"
+          },
+          "link": null
+        },
+        {
+          "label": "文件名前缀",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "label": "格式",
+          "name": "format",
+          "type": "COMBO",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "label": "Ping-Pong",
+          "name": "pingpong",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "pingpong"
+          },
+          "link": null
+        },
+        {
+          "label": "保存到输出文件夹",
+          "name": "save_output",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "save_output"
+          },
+          "link": null
+        },
+        {
+          "label": "保存元数据",
+          "name": "save_metadata",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "save_metadata"
+          },
+          "link": null
+        },
+        {
+          "label": "修剪音频",
+          "name": "trim_to_audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "trim_to_audio"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "3234937ff5f3ca19068aaba5042771514de2429d",
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 24,
+        "loop_count": 0,
+        "filename_prefix": "AnimateDiff",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 19,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": true,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "AnimateDiff_00043.mp4",
+            "subfolder": "",
+            "type": "output",
+            "format": "video/h264-mp4",
+            "frame_rate": 24,
+            "workflow": "AnimateDiff_00043.png",
+            "fullpath": "/root/lvfengchun/code/ComfyUI/output/AnimateDiff_00043.mp4"
+          }
+        }
+      }
+    },
+    {
+      "id": 26,
+      "type": "ReservedVRAMSetter",
+      "pos": [
+        2931.273237724076,
+        -2180.938245200802
+      ],
+      "size": [
+        287.4890300854503,
+        218
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 52
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            53
+          ]
+        },
+        {
+          "name": "SEED",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "Reserved(GB)",
+          "type": "FLOAT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "reservedvram",
+        "ver": "d4dfb468da8f1c84533ab190bc531ee206afa690",
+        "Node name for S&R": "ReservedVRAMSetter"
+      },
+      "widgets_values": [
+        0.6,
+        "auto",
+        921031455578240,
+        "randomize",
+        0,
+        true
+      ]
+    }
+  ],
+  "links": [
+    [
+      15,
+      1,
+      0,
+      14,
+      0,
+      "SEC_MODEL"
+    ],
+    [
+      18,
+      14,
+      0,
+      5,
+      0,
+      "MASK"
+    ],
+    [
+      28,
+      4,
+      0,
+      17,
+      0,
+      "IMAGE"
+    ],
+    [
+      29,
+      17,
+      0,
+      14,
+      4,
+      "STRING"
+    ],
+    [
+      30,
+      17,
+      1,
+      14,
+      5,
+      "STRING"
+    ],
+    [
+      35,
+      5,
+      0,
+      20,
+      0,
+      "MASK"
+    ],
+    [
+      40,
+      20,
+      0,
+      19,
+      2,
+      "MASK"
+    ],
+    [
+      41,
+      19,
+      0,
+      23,
+      0,
+      "IMAGE"
+    ],
+    [
+      42,
+      13,
+      3,
+      24,
+      0,
+      "VHS_VIDEOINFO"
+    ],
+    [
+      45,
+      24,
+      1,
+      19,
+      6,
+      "INT"
+    ],
+    [
+      46,
+      13,
+      0,
+      25,
+      0,
+      "IMAGE"
+    ],
+    [
+      47,
+      25,
+      0,
+      4,
+      0,
+      "IMAGE"
+    ],
+    [
+      48,
+      25,
+      0,
+      14,
+      1,
+      "IMAGE"
+    ],
+    [
+      49,
+      25,
+      0,
+      19,
+      1,
+      "IMAGE"
+    ],
+    [
+      52,
+      18,
+      0,
+      26,
+      0,
+      "VOID_MODEL"
+    ],
+    [
+      53,
+      26,
+      0,
+      19,
+      0,
+      "VOID_MODEL"
+    ],
+    [
+      56,
+      25,
+      3,
+      19,
+      5,
+      "INT"
+    ],
+    [
+      57,
+      25,
+      4,
+      19,
+      4,
+      "INT"
+    ],
+    [
+      63,
+      25,
+      0,
+      32,
+      0,
+      "IMAGE"
+    ],
+    [
+      64,
+      32,
+      0,
+      22,
+      0,
+      "IMAGE"
+    ],
+    [
+      66,
+      5,
+      0,
+      33,
+      0,
+      "MASK"
+    ],
+    [
+      67,
+      33,
+      0,
+      32,
+      1,
+      "IMAGE"
+    ],
+    [
+      68,
+      19,
+      0,
+      34,
+      0,
+      "IMAGE"
+    ],
+    [
+      69,
+      17,
+      0,
+      35,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "workflowRendererVersion": "LG",
+    "ue_links": [],
+    "ds": {
+      "scale": 0.5989500000000213,
+      "offset": [
+        -1190.3595249818611,
+        3663.080983376282
+      ]
+    },
+    "frontendVersion": "1.42.10",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}
