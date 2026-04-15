@@ -62,7 +62,9 @@ def main(video:str, output_folder:str):
     output = nw.get_noise_from_video(
         video,
         remove_background=False, #Set this to True to matte the foreground - and force the background to have no flow
-        visualize=True,          #Generates nice visualization videos and previews in Jupyter notebook
+        # Disable notebook-style visualization in ComfyUI. The rp preview path may try to
+        # fetch Google fonts at runtime, which breaks in offline environments.
+        visualize=False,
         save_files=True,         #Set this to False if you just want the noises without saving to a numpy file
         
         noise_channels=16,
@@ -74,7 +76,8 @@ def main(video:str, output_folder:str):
 
     output.first_frame_path = rp.save_image(video[0],rp.path_join(output_folder,'first_frame.png'))
 
-    rp.save_video_mp4(video, rp.path_join(output_folder, 'input.mp4'), framerate=12, video_bitrate='max')
+    # This preview video is only diagnostic and has caused backend-specific
+    # encoder failures in offline/runtime environments, so skip it here.
 
     #output.numpy_noises_downsampled = as_numpy_images(
         #nw.resize_noise(

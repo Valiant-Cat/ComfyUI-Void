@@ -537,34 +537,79 @@ def _load_and_resize_warped_noise(noise_path: str, target_shape: Tuple[int, int,
     return warped_noise
 
 
-class VOIDModelLoader:
+def _loader_input_types(default_checkpoint: str):
+    return {
+        "required": {
+            "base_model": (BASE_MODEL_CHOICES, {"default": BASE_MODEL_CHOICES[0]}),
+            "checkpoint_name": (_checkpoint_choices(), {"default": default_checkpoint}),
+            "precision": (list(PRECISIONS.keys()), {"default": "bf16"}),
+            "memory_mode": (
+                ["model_cpu_offload", "sequential_cpu_offload", "model_full_load"],
+                {"default": "model_cpu_offload"},
+            ),
+            "scheduler": (["model_default"] + SCHEDULER_NAMES, {"default": "model_default"}),
+            "unload_cached_void": ("BOOLEAN", {"default": False}),
+            "unload_all_comfy_models": ("BOOLEAN", {"default": False}),
+        }
+    }
+
+
+def _load_fixed_variant_model(
+    *,
+    variant: str,
+    base_model: str,
+    checkpoint_name: str,
+    precision: str,
+    memory_mode: str,
+    scheduler: str,
+    unload_cached_void: bool,
+    unload_all_comfy_models: bool,
+):
+    if variant == "pass1" and "pass2" in checkpoint_name:
+        checkpoint_name = "void_pass1.safetensors"
+    if variant == "pass2" and "pass1" in checkpoint_name:
+        checkpoint_name = "void_pass2.safetensors"
+
+    cache_key = (base_model, variant, checkpoint_name, precision, memory_mode, scheduler)
+    with _MODEL_LOCK:
+        if unload_all_comfy_models and mm is not None:
+            try:
+                mm.unload_all_models()
+                mm.cleanup_models()
+            except Exception:
+                pass
+            _soft_empty_cache()
+
+        if unload_cached_void:
+            _clear_model_cache()
+        elif cache_key in _MODEL_CACHE:
+            return _MODEL_CACHE[cache_key]
+
+        bundle = _load_void_pipeline(
+            base_model_name=base_model,
+            checkpoint_name=checkpoint_name,
+            variant=variant,
+            precision=precision,
+            memory_mode=memory_mode,
+            scheduler_name=scheduler,
+        )
+        _MODEL_CACHE[cache_key] = bundle
+        return bundle
+
+
+class VOIDPass1ModelLoader:
     @classmethod
     def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "base_model": (BASE_MODEL_CHOICES, {"default": BASE_MODEL_CHOICES[0]}),
-                "variant": (["pass1", "pass2"], {"default": "pass1"}),
-                "checkpoint_name": (_checkpoint_choices(), {"default": "void_pass1.safetensors"}),
-                "precision": (list(PRECISIONS.keys()), {"default": "bf16"}),
-                "memory_mode": (
-                    ["model_cpu_offload", "sequential_cpu_offload", "model_full_load"],
-                    {"default": "model_cpu_offload"},
-                ),
-                "scheduler": (["model_default"] + SCHEDULER_NAMES, {"default": "model_default"}),
-                "unload_cached_void": ("BOOLEAN", {"default": True}),
-                "unload_all_comfy_models": ("BOOLEAN", {"default": False}),
-            }
-        }
+        return _loader_input_types("void_pass1.safetensors")
 
-    RETURN_TYPES = ("VOID_MODEL",)
-    RETURN_NAMES = ("void_model",)
+    RETURN_TYPES = ("VOID_PASS1_MODEL",)
+    RETURN_NAMES = ("void_pass1_model",)
     FUNCTION = "load_model"
     CATEGORY = "VOID"
 
     def load_model(
         self,
         base_model: str,
-        variant: str,
         checkpoint_name: str,
         precision: str,
         memory_mode: str,
@@ -573,36 +618,51 @@ class VOIDModelLoader:
         unload_all_comfy_models: bool,
     ):
         _register_void_model_dir()
-        if variant == "pass1" and "pass2" in checkpoint_name:
-            checkpoint_name = "void_pass1.safetensors"
-        if variant == "pass2" and "pass1" in checkpoint_name:
-            checkpoint_name = "void_pass2.safetensors"
+        bundle = _load_fixed_variant_model(
+            variant="pass1",
+            base_model=base_model,
+            checkpoint_name=checkpoint_name,
+            precision=precision,
+            memory_mode=memory_mode,
+            scheduler=scheduler,
+            unload_cached_void=unload_cached_void,
+            unload_all_comfy_models=unload_all_comfy_models,
+        )
+        return (bundle,)
 
-        cache_key = (base_model, variant, checkpoint_name, precision, memory_mode, scheduler)
-        with _MODEL_LOCK:
-            if unload_all_comfy_models and mm is not None:
-                try:
-                    mm.unload_all_models()
-                    mm.cleanup_models()
-                except Exception:
-                    pass
-                _soft_empty_cache()
 
-            if unload_cached_void:
-                _clear_model_cache()
-            elif cache_key in _MODEL_CACHE:
-                return (_MODEL_CACHE[cache_key],)
+class VOIDPass2ModelLoader:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return _loader_input_types("void_pass2.safetensors")
 
-            bundle = _load_void_pipeline(
-                base_model_name=base_model,
-                checkpoint_name=checkpoint_name,
-                variant=variant,
-                precision=precision,
-                memory_mode=memory_mode,
-                scheduler_name=scheduler,
-            )
-            _MODEL_CACHE[cache_key] = bundle
-            return (bundle,)
+    RETURN_TYPES = ("VOID_PASS2_MODEL",)
+    RETURN_NAMES = ("void_pass2_model",)
+    FUNCTION = "load_model"
+    CATEGORY = "VOID"
+
+    def load_model(
+        self,
+        base_model: str,
+        checkpoint_name: str,
+        precision: str,
+        memory_mode: str,
+        scheduler: str,
+        unload_cached_void: bool,
+        unload_all_comfy_models: bool,
+    ):
+        _register_void_model_dir()
+        bundle = _load_fixed_variant_model(
+            variant="pass2",
+            base_model=base_model,
+            checkpoint_name=checkpoint_name,
+            precision=precision,
+            memory_mode=memory_mode,
+            scheduler=scheduler,
+            unload_cached_void=unload_cached_void,
+            unload_all_comfy_models=unload_all_comfy_models,
+        )
+        return (bundle,)
 
 
 class VOIDMaskProcessor:
@@ -676,12 +736,110 @@ class VOIDMaskProcessor:
         return (ready_mask, preview)
 
 
-class VOIDInpaint:
+def _run_void_inpaint(
+    *,
+    void_model: dict,
+    images: torch.Tensor,
+    mask: torch.Tensor,
+    prompt: str,
+    seed: int,
+    height: int,
+    width: int,
+    temporal_window_size: int,
+    max_video_length: int,
+    use_model_defaults: bool,
+    guidance_scale: float,
+    num_inference_steps: int,
+    fps: int,
+    negative_prompt: str = "",
+    pass1_images: Optional[torch.Tensor] = None,
+    warped_noise_path: str = "",
+):
+    pipeline = void_model["pipeline"]
+    defaults = void_model["defaults"]
+    device = void_model["device"]
+    dtype = void_model["dtype"]
+
+    _validate_temporal_window_size(temporal_window_size, pipeline)
+
+    if use_model_defaults:
+        guidance_scale = defaults["guidance_scale"]
+        num_inference_steps = defaults["num_inference_steps"]
+    if not negative_prompt.strip():
+        negative_prompt = defaults["negative_prompt"]
+
+    input_video, original_frames = _prepare_video_tensor(
+        images=images,
+        height=height,
+        width=width,
+        max_video_length=max_video_length,
+        temporal_window_size=temporal_window_size,
+    )
+    frame_count = input_video.shape[2]
+    input_mask = _prepare_mask_sequence(mask, frame_count, height, width).unsqueeze(0).unsqueeze(0)
+
+    latents = None
+    if void_model["variant"] == "pass2":
+        noise_path = warped_noise_path.strip()
+        if not noise_path:
+            if pass1_images is None:
+                raise ValueError("VOID pass2 needs either pass1_images or warped_noise_path.")
+            noise_path = _generate_warped_noise_from_images(pass1_images, fps=fps)
+
+        latent_t = (frame_count - 1) // 4 + 1
+        latent_h = height // 8
+        latent_w = width // 8
+        latents = _load_and_resize_warped_noise(
+            noise_path,
+            (latent_t, latent_h, latent_w, 16),
+            device=device,
+            dtype=dtype,
+        )
+
+    generator = torch.Generator(device=device).manual_seed(seed)
+    progress_kwargs = {"comfyui_progressbar": ProgressBar is not None}
+
+    with torch.no_grad():
+        output = pipeline(
+            prompt=prompt,
+            negative_prompt=negative_prompt,
+            num_frames=frame_count,
+            temporal_window_size=temporal_window_size,
+            height=height,
+            width=width,
+            generator=generator,
+            guidance_scale=guidance_scale,
+            num_inference_steps=num_inference_steps,
+            video=input_video,
+            mask_video=input_mask,
+            strength=1.0,
+            use_trimask=defaults["use_trimask"],
+            zero_out_mask_region=False,
+            use_vae_mask=True,
+            stack_mask=False,
+            latents=latents,
+            **progress_kwargs,
+        ).videos
+
+    result = output if isinstance(output, torch.Tensor) else torch.from_numpy(output)
+    if result.ndim != 5:
+        raise ValueError(f"Unexpected VOID output shape: {tuple(result.shape)}")
+    result_frames = result[0]
+    if result_frames.shape[0] in (1, 3):
+        result_frames = result_frames.permute(1, 2, 3, 0)
+    result_frames = result_frames.clamp(0.0, 1.0)
+    result_frames = result_frames[:original_frames]
+
+    _soft_empty_cache()
+    return (result_frames,)
+
+
+class VOIDPass1Inpaint:
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "void_model": ("VOID_MODEL",),
+                "void_pass1_model": ("VOID_PASS1_MODEL",),
                 "images": ("IMAGE",),
                 "mask": ("MASK",),
                 "prompt": ("STRING", {"multiline": True}),
@@ -693,6 +851,68 @@ class VOIDInpaint:
                 "use_model_defaults": ("BOOLEAN", {"default": True}),
                 "guidance_scale": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 50.0, "step": 0.1}),
                 "num_inference_steps": ("INT", {"default": 30, "min": 1, "max": 500, "step": 1}),
+            },
+            "optional": {
+                "negative_prompt": ("STRING", {"multiline": True, "default": ""}),
+            },
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("images",)
+    FUNCTION = "run"
+    CATEGORY = "VOID"
+
+    def run(
+        self,
+        void_pass1_model: dict,
+        images: torch.Tensor,
+        mask: torch.Tensor,
+        prompt: str,
+        seed: int,
+        height: int,
+        width: int,
+        temporal_window_size: int,
+        max_video_length: int,
+        use_model_defaults: bool,
+        guidance_scale: float,
+        num_inference_steps: int,
+        negative_prompt: str = "",
+    ):
+        return _run_void_inpaint(
+            void_model=void_pass1_model,
+            images=images,
+            mask=mask,
+            prompt=prompt,
+            seed=seed,
+            height=height,
+            width=width,
+            temporal_window_size=temporal_window_size,
+            max_video_length=max_video_length,
+            use_model_defaults=use_model_defaults,
+            guidance_scale=guidance_scale,
+            num_inference_steps=num_inference_steps,
+            fps=24,
+            negative_prompt=negative_prompt,
+        )
+
+
+class VOIDPass2Inpaint:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "void_pass2_model": ("VOID_PASS2_MODEL",),
+                "images": ("IMAGE",),
+                "mask": ("MASK",),
+                "prompt": ("STRING", {"multiline": True}),
+                "seed": ("INT", {"default": 42, "min": 0, "max": 0xFFFFFFFFFFFFFFFF}),
+                "height": ("INT", {"default": 384, "min": 64, "max": 4096, "step": 8}),
+                "width": ("INT", {"default": 672, "min": 64, "max": 4096, "step": 8}),
+                "temporal_window_size": ("INT", {"default": 85, "min": 5, "max": 4093, "step": 8}),
+                "max_video_length": ("INT", {"default": 197, "min": 1, "max": 4096, "step": 1}),
+                "use_model_defaults": ("BOOLEAN", {"default": True}),
+                "guidance_scale": ("FLOAT", {"default": 6.0, "min": 0.0, "max": 50.0, "step": 0.1}),
+                "num_inference_steps": ("INT", {"default": 50, "min": 1, "max": 500, "step": 1}),
                 "fps": ("INT", {"default": 24, "min": 1, "max": 240, "step": 1}),
             },
             "optional": {
@@ -709,7 +929,7 @@ class VOIDInpaint:
 
     def run(
         self,
-        void_model: dict,
+        void_pass2_model: dict,
         images: torch.Tensor,
         mask: torch.Tensor,
         prompt: str,
@@ -726,95 +946,40 @@ class VOIDInpaint:
         pass1_images: Optional[torch.Tensor] = None,
         warped_noise_path: str = "",
     ):
-        pipeline = void_model["pipeline"]
-        defaults = void_model["defaults"]
-        device = void_model["device"]
-        dtype = void_model["dtype"]
-
-        _validate_temporal_window_size(temporal_window_size, pipeline)
-
-        if use_model_defaults:
-            guidance_scale = defaults["guidance_scale"]
-            num_inference_steps = defaults["num_inference_steps"]
-        if not negative_prompt.strip():
-            negative_prompt = defaults["negative_prompt"]
-
-        input_video, original_frames = _prepare_video_tensor(
+        return _run_void_inpaint(
+            void_model=void_pass2_model,
             images=images,
+            mask=mask,
+            prompt=prompt,
+            seed=seed,
             height=height,
             width=width,
-            max_video_length=max_video_length,
             temporal_window_size=temporal_window_size,
+            max_video_length=max_video_length,
+            use_model_defaults=use_model_defaults,
+            guidance_scale=guidance_scale,
+            num_inference_steps=num_inference_steps,
+            fps=fps,
+            negative_prompt=negative_prompt,
+            pass1_images=pass1_images,
+            warped_noise_path=warped_noise_path,
         )
-        frame_count = input_video.shape[2]
-        input_mask = _prepare_mask_sequence(mask, frame_count, height, width).unsqueeze(0).unsqueeze(0)
-
-        latents = None
-        if void_model["variant"] == "pass2":
-            noise_path = warped_noise_path.strip()
-            if not noise_path:
-                if pass1_images is None:
-                    raise ValueError("VOID pass2 needs either pass1_images or warped_noise_path.")
-                noise_path = _generate_warped_noise_from_images(pass1_images, fps=fps)
-
-            latent_t = (frame_count - 1) // 4 + 1
-            latent_h = height // 8
-            latent_w = width // 8
-            latents = _load_and_resize_warped_noise(
-                noise_path,
-                (latent_t, latent_h, latent_w, 16),
-                device=device,
-                dtype=dtype,
-            )
-
-        generator = torch.Generator(device=device).manual_seed(seed)
-        progress_kwargs = {"comfyui_progressbar": ProgressBar is not None}
-
-        with torch.no_grad():
-            output = pipeline(
-                prompt=prompt,
-                negative_prompt=negative_prompt,
-                num_frames=frame_count,
-                temporal_window_size=temporal_window_size,
-                height=height,
-                width=width,
-                generator=generator,
-                guidance_scale=guidance_scale,
-                num_inference_steps=num_inference_steps,
-                video=input_video,
-                mask_video=input_mask,
-                strength=1.0,
-                use_trimask=defaults["use_trimask"],
-                zero_out_mask_region=False,
-                use_vae_mask=True,
-                stack_mask=False,
-                latents=latents,
-                **progress_kwargs,
-            ).videos
-
-        result = output if isinstance(output, torch.Tensor) else torch.from_numpy(output)
-        if result.ndim != 5:
-            raise ValueError(f"Unexpected VOID output shape: {tuple(result.shape)}")
-        result_frames = result[0]
-        if result_frames.shape[0] in (1, 3):
-            result_frames = result_frames.permute(1, 2, 3, 0)
-        result_frames = result_frames.clamp(0.0, 1.0)
-        result_frames = result_frames[:original_frames]
-
-        _soft_empty_cache()
-        return (result_frames,)
 
 
 _register_void_model_dir()
 
 NODE_CLASS_MAPPINGS = {
-    "VOIDModelLoader": VOIDModelLoader,
+    "VOIDPass1ModelLoader": VOIDPass1ModelLoader,
+    "VOIDPass2ModelLoader": VOIDPass2ModelLoader,
     "VOIDMaskProcessor": VOIDMaskProcessor,
-    "VOIDInpaint": VOIDInpaint,
+    "VOIDPass1Inpaint": VOIDPass1Inpaint,
+    "VOIDPass2Inpaint": VOIDPass2Inpaint,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "VOIDModelLoader": "VOID Model Loader",
+    "VOIDPass1ModelLoader": "VOID Pass1 Model Loader",
+    "VOIDPass2ModelLoader": "VOID Pass2 Model Loader",
     "VOIDMaskProcessor": "VOID Quadmask Processor",
-    "VOIDInpaint": "VOID Inpaint",
+    "VOIDPass1Inpaint": "VOID Pass1 Inpaint",
+    "VOIDPass2Inpaint": "VOID Pass2 Inpaint",
 }

@@ -18,11 +18,13 @@ This is an inference-focused port of the original project. It vendors the runtim
 
 ## Nodes
 
-This package registers three nodes under the `VOID` category:
+This package registers dedicated Pass 1 / Pass 2 nodes under the `VOID` category:
 
-- `VOID Model Loader`
+- `VOID Pass1 Model Loader`
+- `VOID Pass2 Model Loader`
 - `VOID Quadmask Processor`
-- `VOID Inpaint`
+- `VOID Pass1 Inpaint`
+- `VOID Pass2 Inpaint`
 
 ## Requirements
 
@@ -98,8 +100,8 @@ Recommended workflow:
 1. Load your source video frames into ComfyUI as `IMAGE`.
 2. Create or load a mask sequence.
 3. Use `VOID Quadmask Processor` to convert masks into the expected VOID-ready mask format.
-4. Use `VOID Model Loader` to load either Pass 1 or Pass 2.
-5. Run `VOID Inpaint`.
+4. Use `VOID Pass1 Model Loader` with `VOID Pass1 Inpaint` for the first pass.
+5. If needed, use `VOID Pass2 Model Loader` with `VOID Pass2 Inpaint` for warped-noise refinement.
 6. Save the output frames back to video with your preferred ComfyUI video save node.
 
 Recommended mask node: https://github.com/9nate-drake/Comfyui-SecNodes.git
@@ -108,7 +110,7 @@ Example workflow JSON: `ComfyUI/custom_nodes/ComfyUI-Void/void-workflow-example.
 
 ## Node Notes
 
-### VOID Model Loader
+### VOID Pass1 / Pass2 Model Loader
 
 Loads:
 
@@ -116,12 +118,11 @@ Loads:
 - VOID checkpoint
 - scheduler
 - precision
-- Pass 1 / Pass 2 variant
 
 Use:
 
-- `pass1` for standard inference
-- `pass2` when you want warped-noise refinement
+- `VOID Pass1 Model Loader` for standard inference
+- `VOID Pass2 Model Loader` for warped-noise refinement
 
 ### VOID Quadmask Processor
 
@@ -134,7 +135,7 @@ The resulting mask follows the VOID semantic layout:
 - `127`: affected region
 - `255`: keep/background
 
-### VOID Inpaint
+### VOID Pass1 / Pass2 Inpaint
 
 Runs the VOID inpainting pipeline on the video sequence.
 
@@ -142,14 +143,14 @@ Important parameters:
 
 - `temporal_window_size`: multidiffusion window size, not total output duration
 - `max_video_length`: max number of frames to process from the input
-- `fps`: used when generating temporary warped-noise video for Pass 2
+- `fps`: only needed by `VOID Pass2 Inpaint` when generating temporary warped-noise video
 
 ## Important Behavior
 
 - Output frame count follows the actual processed input length, not `temporal_window_size`.
 - `temporal_window_size` only controls the temporal inference window.
 - Some frame counts may be clipped slightly at the tail to satisfy the model's temporal patching constraints.
-- Pass 2 requires either `pass1_images` or a `warped_noise_path`.
+- `VOID Pass2 Inpaint` requires either `pass1_images` or a `warped_noise_path`.
 
 ## Fixes In This Port
 
